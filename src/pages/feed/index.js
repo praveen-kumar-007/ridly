@@ -57,6 +57,16 @@ export default function Feed() {
       }
   
       const data = await searchTracks(targetQuery, token, 15);
+      
+      // PRELOAD IMAGES AGGRESSIVELY FOR ZERO-DELAY RENDERING
+      data.tracks.forEach(track => {
+          const imgUrl = track.image ? track.image[track.image.length - 1]['#text'] : null;
+          if (imgUrl) {
+              const img = new Image();
+              img.src = imgUrl;
+          }
+      });
+
       if (!token) {
         setTracks(data.tracks);
         setQueue(data.tracks); // Sync queue initially
