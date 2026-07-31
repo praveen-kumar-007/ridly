@@ -85,11 +85,14 @@ export default function Feed() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.state?.moodQuery]);
 
+  const [isFetchingPage, setIsFetchingPage] = useState(false);
+
   const lastTrackElementRef = (node) => {
-    if (loading) return;
+    if (loading || isFetchingPage) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && pageToken) {
+      if (entries[0].isIntersecting && pageToken && !isFetchingPage) {
+        setIsFetchingPage(true);
         searchTracks(searchQuery, pageToken, 15).then(data => {
             if (data && data.tracks) {
               setTracks(prev => {
@@ -99,6 +102,7 @@ export default function Feed() {
               });
               setPageToken(data.nextPageToken);
             }
+            setIsFetchingPage(false);
         });
       }
     });
@@ -141,6 +145,10 @@ export default function Feed() {
     <div className='resso-feed-container'>
       {loading && tracks.length === 0 ? (
         <div className="loader">Building your Vibe...</div>
+      ) : tracks.length === 0 ? (
+        <div className="loader" style={{ fontSize: '1rem', padding: '20px', textAlign: 'center' }}>
+          We hit a snag! The Music API limit might be reached.<br/>Please try again in a few minutes.
+        </div>
       ) : (
         <div className="resso-scroll-snap">
           {tracks.map((track, index) => {

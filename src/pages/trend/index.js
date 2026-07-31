@@ -34,11 +34,14 @@ export default function Trend() {
     fetchTrending();
   }, [setQueue]);
 
+  const [isFetchingPage, setIsFetchingPage] = useState(false);
+
   const lastTrackElementRef = (node) => {
-    if (loading) return;
+    if (loading || isFetchingPage) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && pageToken) {
+      if (entries[0].isIntersecting && pageToken && !isFetchingPage) {
+        setIsFetchingPage(true);
         getTopTracks(pageToken, 15).then(data => {
             if (data && data.tracks) {
               setTracks(prev => {
@@ -48,22 +51,21 @@ export default function Trend() {
               });
               setPageToken(data.nextPageToken);
             }
+            setIsFetchingPage(false);
         });
       }
     });
     if (node) observer.current.observe(node);
   };
 
-  const handleTrackVisible = (index) => {
-    if (currentTrack?.youtubeId !== tracks[index]?.youtubeId) {
-        playPlaylist(tracks, index);
-    }
-  };
-
   return (
     <div className='resso-feed-container'>
       {loading && tracks.length === 0 ? (
         <div className="loader">Loading Trending India...</div>
+      ) : tracks.length === 0 ? (
+        <div className="loader" style={{ fontSize: '1rem', padding: '20px', textAlign: 'center' }}>
+          We hit a snag! The Music API limit might be reached.<br/>Please try again in a few minutes.
+        </div>
       ) : (
         <div className="resso-scroll-snap">
           {tracks.map((track, index) => {
@@ -76,7 +78,6 @@ export default function Trend() {
                 className="resso-track-card" 
                 key={`${track.youtubeId}-${index}`}
                 ref={isLast ? lastTrackElementRef : null}
-                onMouseEnter={() => handleTrackVisible(index)}
               >
                   <div className="resso-bg-blur" style={{ backgroundImage: `url(${imageUrl})` }}></div>
                   <SocialActions track={track} />
@@ -96,7 +97,7 @@ export default function Trend() {
                           </div>
                           <h2 className="resso-artist">{track.artist ? track.artist.name : 'Unknown Artist'}</h2>
                           <p className="resso-reason">Trending in India</p>
-                          <MediaControls track={track} />
+                          <MediaControls track={track} onPlay={() => isPlayingThis ? togglePlay() : playPlaylist(tracks, index)} />
                       </div>
                   </div>
                   <ProgressBar track={track} />
