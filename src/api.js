@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const YOUTUBE_KEY = process.env.REACT_APP_YOUTUBE_API_KEY || 'AIzaSyB2xyRZwYvHK3CHtKOBDLlPhaICswuL1-M';
+const YOUTUBE_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
 // Normalizes YouTube API response to match the legacy Last.fm format expected by our UI
