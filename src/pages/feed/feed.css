@@ -1,5 +1,5 @@
 .resso-feed-container {
-  height: calc(100vh - 120px); /* minus player and padding */
+  height: calc(100dvh - 120px); /* minus player and padding */
   width: 100%;
   overflow: hidden;
   border-radius: 20px;

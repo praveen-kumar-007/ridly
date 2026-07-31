@@ -1,5 +1,5 @@
 .main-body {
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     background-color: var(--bg-color-main);
     display: flex;
@@ -27,7 +27,7 @@
     display: flex;
     flex-direction: column;
     padding: 0px;
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     overflow: hidden;
     z-index: 1;
