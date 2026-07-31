@@ -114,9 +114,15 @@ export default function Feed() {
         if (entry.isIntersecting) {
           const index = Number(entry.target.dataset.index);
           const trackToPlay = tracks[index];
-          // Ensure we don't restart if already playing this track
-          if (trackToPlay && currentTrack?.youtubeId !== trackToPlay.youtubeId) {
-             playPlaylist(tracks, index);
+          
+          if (trackToPlay) {
+             if (currentTrack?.youtubeId !== trackToPlay.youtubeId) {
+                // If it's a new track, load and play it
+                playPlaylist(tracks, index);
+             } else if (!isPlaying) {
+                // If it's the current track but it's paused, resume it
+                togglePlay();
+             }
           }
         }
       });
@@ -129,7 +135,7 @@ export default function Feed() {
     return () => {
       if (autoPlayObserver.current) autoPlayObserver.current.disconnect();
     };
-  }, [tracks, currentTrack, playPlaylist]);
+  }, [tracks, currentTrack, isPlaying, playPlaylist, togglePlay]);
 
   return (
     <div className='resso-feed-container'>
