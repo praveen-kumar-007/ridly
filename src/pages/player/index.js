@@ -1,7 +1,9 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { PlayerContext } from '../../context/PlayerContext';
 import './player.css';
 import { FaPlay, FaPause, FaHeart, FaCommentDots, FaShare, FaPlus, FaStepBackward, FaStepForward } from 'react-icons/fa';
+import { useSwipeable } from 'react-swipeable';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Player() {
   const { 
@@ -14,59 +16,57 @@ export default function Player() {
     prevTrack,
     currentTime,
     duration,
-    formatTime
+    formatTime,
+    currentIndex
   } = useContext(PlayerContext);
 
-  const [touchStartY, setTouchStartY] = useState(null);
-  const [touchEndY, setTouchEndY] = useState(null);
-  const minSwipeDistance = 50;
+  const [direction, setDirection] = useState(1); // 1 for up/next, -1 for down/prev
 
-  const handleTouchStart = (e) => {
-    setTouchEndY(null);
-    setTouchStartY(e.targetTouches[0].clientY);
-  };
+  const handlers = useSwipeable({
+    onSwipedUp: () => {
+      setDirection(1);
+      nextTrack();
+    },
+    onSwipedDown: () => {
+      setDirection(-1);
+      prevTrack();
+    },
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true,
+    delta: 10 // smaller delta for more responsive swipes
+  });
 
-  const handleTouchMove = (e) => {
-    setTouchEndY(e.targetTouches[0].clientY);
-  };
+  // Handle desktop mouse wheel scroll
+  useEffect(() => {
+    let timeoutId;
+    const handleWheel = (e) => {
+      if (timeoutId) return; // simple debounce
+      timeoutId = setTimeout(() => {
+        if (e.deltaY > 0) {
+          setDirection(1);
+          nextTrack();
+        } else if (e.deltaY < 0) {
+          setDirection(-1);
+          prevTrack();
+        }
+        timeoutId = null;
+      }, 300);
+    };
 
-  const handleTouchEnd = () => {
-    if (!touchStartY || !touchEndY) return;
-    const distance = touchStartY - touchEndY;
-    const isUpSwipe = distance > minSwipeDistance;
-    const isDownSwipe = distance < -minSwipeDistance;
-    
-    if (isUpSwipe) {
-      nextTrack(); // Swipe up -> Next track
-    } else if (isDownSwipe) {
-      prevTrack(); // Swipe down -> Prev track
+    const container = document.getElementById('resso-player-container');
+    if (container) {
+      container.addEventListener('wheel', handleWheel, { passive: false });
     }
-  };
-
-  // Allow mouse drag/swipe for desktop users as well
-  const [isDragging, setIsDragging] = useState(false);
-  
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setTouchStartY(e.clientY);
-    setTouchEndY(null);
-  };
-
-  const handleMouseMove = (e) => {
-    if (isDragging) {
-      setTouchEndY(e.clientY);
-    }
-  };
-
-  const handleMouseUp = () => {
-    if (isDragging) {
-      setIsDragging(false);
-      handleTouchEnd();
-    }
-  };
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', handleWheel);
+      }
+      clearTimeout(timeoutId);
+    };
+  }, [nextTrack, prevTrack]);
 
   const handleSeek = (e) => {
-    e.stopPropagation(); // Prevent swipe interaction from triggering
+    e.stopPropagation();
     const rect = e.target.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const percentage = (x / rect.width) * 100;
@@ -77,86 +77,124 @@ export default function Player() {
   const trackName = currentTrack ? currentTrack.name : 'Select a track from Trending';
   const artistName = currentTrack ? (typeof currentTrack.artist === 'string' ? currentTrack.artist : currentTrack.artist.name) : '';
 
+  const variants = {
+    enter: (direction) => {
+      return {
+        y: direction > 0 ? '100%' : '-100%',
+        opacity: 0,
+        scale: 0.9
+      };
+    },
+    center: {
+      zIndex: 1,
+      y: 0,
+      opacity: 1,
+      scale: 1
+    },
+    exit: (direction) => {
+      return {
+        zIndex: 0,
+        y: direction < 0 ? '100%' : '-100%',
+        opacity: 0,
+        scale: 0.9
+      };
+    }
+  };
+
   return (
-    <div 
-      className='resso-player-container'
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    >
-      {/* Blurred Background */}
-      <div 
-        className="resso-background" 
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      ></div>
+    <div id="resso-player-container" className='resso-player-container' {...handlers}>
+      {/* Background is stationary to reduce motion sickness, just fades */}
+      <AnimatePresence>
+        <motion.div 
+           key={imageUrl}
+           initial={{ opacity: 0 }}
+           animate={{ opacity: 1 }}
+           exit={{ opacity: 0 }}
+           transition={{ duration: 0.8 }}
+           className="resso-background" 
+           style={{ backgroundImage: `url(${imageUrl})` }}
+        />
+      </AnimatePresence>
       <div className="resso-overlay"></div>
 
-      <div className="resso-content">
-        {/* Top Header */}
-        <div className="resso-header">
-          <p>Now Playing</p>
-        </div>
-
-        {/* Main Album Art (Spinning Vinyl) */}
-        <div className="resso-main-art">
-          <div className={`vinyl-record ${isPlaying ? 'spinning' : 'paused'}`}>
-            <img src={imageUrl} alt="Album Art" className="album-art-center" draggable="false" />
-          </div>
-        </div>
-
-        {/* Right Sidebar Actions */}
-        <div className="resso-sidebar" onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}>
-          <div className="action-item">
-            <div className="action-btn"><FaHeart /></div>
-            <span>Like</span>
-          </div>
-          <div className="action-item">
-            <div className="action-btn"><FaCommentDots /></div>
-            <span>Comment</span>
-          </div>
-          <div className="action-item">
-            <div className="action-btn"><FaShare /></div>
-            <span>Share</span>
-          </div>
-          <div className="action-item">
-            <div className="action-btn"><FaPlus /></div>
-            <span>Add</span>
-          </div>
-        </div>
-
-        {/* Bottom Section */}
-        <div className="resso-bottom" onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}>
-          <div className="song-info">
-            <h2 className="song-title">{trackName}</h2>
-            <p className="song-artist">{artistName}</p>
-          </div>
-
-          <div className="progress-container">
-            <div className="progress-bar-bg" onClick={handleSeek}>
-              <div className="progress-bar-fill" style={{width: `${progress}%`}}></div>
-            </div>
-            <div className="time-info">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-          </div>
-
-          <div className="controls">
-            <button className="control-btn small" onClick={prevTrack}><FaStepBackward /></button>
-            <button 
-              className="control-btn play-btn" 
-              onClick={togglePlay}
-            >
-              {isPlaying ? <FaPause /> : <FaPlay style={{marginLeft: '4px'}} />}
-            </button>
-            <button className="control-btn small" onClick={nextTrack}><FaStepForward /></button>
-          </div>
-        </div>
+      <div className="resso-header">
+        <p>Now Playing</p>
       </div>
+
+      {/* Main Track Content - Slides Up/Down */}
+      <AnimatePresence initial={false} custom={direction}>
+        <motion.div
+          key={currentIndex}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            y: { type: "spring", stiffness: 300, damping: 30 },
+            opacity: { duration: 0.2 }
+          }}
+          className="resso-content-wrapper"
+        >
+          <div className="resso-content">
+            {/* Main Album Art (Spinning Vinyl) */}
+            <div className="resso-main-art">
+              <div className={`vinyl-record ${isPlaying ? 'spinning' : 'paused'}`}>
+                <img src={imageUrl} alt="Album Art" className="album-art-center" draggable="false" />
+              </div>
+            </div>
+
+            {/* Right Sidebar Actions */}
+            <div className="resso-sidebar" onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}>
+              <div className="action-item">
+                <div className="action-btn"><FaHeart /></div>
+                <span>Like</span>
+              </div>
+              <div className="action-item">
+                <div className="action-btn"><FaCommentDots /></div>
+                <span>Comment</span>
+              </div>
+              <div className="action-item">
+                <div className="action-btn"><FaShare /></div>
+                <span>Share</span>
+              </div>
+              <div className="action-item">
+                <div className="action-btn"><FaPlus /></div>
+                <span>Add</span>
+              </div>
+            </div>
+
+            {/* Bottom Section */}
+            <div className="resso-bottom" onMouseDown={e => e.stopPropagation()} onTouchStart={e => e.stopPropagation()}>
+              <div className="song-info">
+                <h2 className="song-title">{trackName}</h2>
+                <p className="song-artist">{artistName}</p>
+              </div>
+
+              <div className="progress-container">
+                <div className="progress-bar-bg" onClick={handleSeek}>
+                  <div className="progress-bar-fill" style={{width: `${progress}%`}}></div>
+                </div>
+                <div className="time-info">
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+              </div>
+
+              <div className="controls">
+                <button className="control-btn small" onClick={() => { setDirection(-1); prevTrack(); }}><FaStepBackward /></button>
+                <button 
+                  className="control-btn play-btn" 
+                  onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                >
+                  {isPlaying ? <FaPause /> : <FaPlay style={{marginLeft: '4px'}} />}
+                </button>
+                <button className="control-btn small" onClick={() => { setDirection(1); nextTrack(); }}><FaStepForward /></button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
