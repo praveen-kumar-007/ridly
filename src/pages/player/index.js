@@ -33,35 +33,35 @@ export default function Player() {
     },
     preventDefaultTouchmoveEvent: true,
     trackMouse: true,
-    delta: 10 // smaller delta for more responsive swipes
+    delta: 40 // adjusted delta for smoother intent
   });
 
-  // Handle desktop mouse wheel scroll
+  // Handle desktop mouse wheel scroll (Instant trigger with cooldown)
   useEffect(() => {
-    let timeoutId;
+    let lastScrollTime = 0;
     const handleWheel = (e) => {
-      if (timeoutId) return; // simple debounce
-      timeoutId = setTimeout(() => {
-        if (e.deltaY > 0) {
-          setDirection(1);
-          nextTrack();
-        } else if (e.deltaY < 0) {
-          setDirection(-1);
-          prevTrack();
-        }
-        timeoutId = null;
-      }, 300);
+      const now = Date.now();
+      if (now - lastScrollTime < 1000) return; // 1 second cooldown between track changes
+
+      if (e.deltaY > 30) {
+        setDirection(1);
+        nextTrack();
+        lastScrollTime = now;
+      } else if (e.deltaY < -30) {
+        setDirection(-1);
+        prevTrack();
+        lastScrollTime = now;
+      }
     };
 
     const container = document.getElementById('resso-player-container');
     if (container) {
-      container.addEventListener('wheel', handleWheel, { passive: false });
+      container.addEventListener('wheel', handleWheel, { passive: true });
     }
     return () => {
       if (container) {
         container.removeEventListener('wheel', handleWheel);
       }
-      clearTimeout(timeoutId);
     };
   }, [nextTrack, prevTrack]);
 
