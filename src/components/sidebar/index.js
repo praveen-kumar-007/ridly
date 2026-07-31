@@ -1,7 +1,7 @@
 import React from 'react';
 import './sidebar.css';
 import SidebarButton from './sidebarButton';
-import { FaSearch, FaFire, FaHeart, FaMusic, FaCompactDisc, FaUser } from 'react-icons/fa';
+import { FaSearch, FaFire, FaHeart, FaMusic, FaCompactDisc } from 'react-icons/fa';
 
 export default function Sidebar() {
   return (
