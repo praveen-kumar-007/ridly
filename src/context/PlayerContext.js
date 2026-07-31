@@ -5,20 +5,41 @@ import YouTube from 'react-youtube';
 export const PlayerContext = createContext();
 
 export const PlayerProvider = ({ children }) => {
-  const [queue, setQueue] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(-1);
-  const [currentTrack, setCurrentTrack] = useState(null);
+  const [queue, setQueue] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('ridly_queue')) || []; } catch(e) { return []; }
+  });
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    try { return parseInt(localStorage.getItem('ridly_index')) || -1; } catch(e) { return -1; }
+  });
+  const [currentTrack, setCurrentTrack] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('ridly_track')) || null; } catch(e) { return null; }
+  });
   
+  const [startTime, setStartTime] = useState(() => {
+    try { return parseFloat(localStorage.getItem('ridly_time')) || 0; } catch(e) { return 0; }
+  });
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(() => startTime);
 
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
+  const [isShuffle, setIsShuffle] = useState(() => {
+    try { return localStorage.getItem('ridly_shuffle') === 'true'; } catch(e) { return false; }
+  });
+  const [isRepeat, setIsRepeat] = useState(() => {
+    try { return localStorage.getItem('ridly_repeat') === 'true'; } catch(e) { return false; }
+  });
   const [isLoadingQueueTrack, setIsLoadingQueueTrack] = useState(false);
   
   const [ytPlayer, setYtPlayer] = useState(null);
+
+  // Persist state when it changes
+  useEffect(() => { localStorage.setItem('ridly_queue', JSON.stringify(queue)); }, [queue]);
+  useEffect(() => { localStorage.setItem('ridly_index', currentIndex.toString()); }, [currentIndex]);
+  useEffect(() => { if (currentTrack) localStorage.setItem('ridly_track', JSON.stringify(currentTrack)); }, [currentTrack]);
+  useEffect(() => { localStorage.setItem('ridly_shuffle', isShuffle); }, [isShuffle]);
+  useEffect(() => { localStorage.setItem('ridly_repeat', isRepeat); }, [isRepeat]);
 
   // Sync progress bar manually since YouTube API doesn't have timeupdate event
   useEffect(() => {
@@ -32,6 +53,7 @@ export const PlayerProvider = ({ children }) => {
             setCurrentTime(ct);
             setDuration(dur);
             setProgress((ct / dur) * 100);
+            localStorage.setItem('ridly_time', ct.toString());
           }
         } catch (e) {
             // Ignore error if player is destroyed or not ready
@@ -80,6 +102,7 @@ export const PlayerProvider = ({ children }) => {
     setIsPlaying(false);
     setProgress(0);
     setCurrentTime(0);
+    setStartTime(0); // Reset saved time for fresh tracks
     
     let youtubeId = track.youtubeId;
     const artistName = typeof track.artist === 'string' ? track.artist : (track.artist?.name || 'Unknown');
@@ -220,6 +243,7 @@ export const PlayerProvider = ({ children }) => {
                 autoplay: 1, // Auto-play when video loads
                 controls: 0, // Hide controls
                 playsinline: 1, // Crucial for iOS background playback
+                start: Math.floor(startTime),
               }
             }}
             onReady={onReady}
