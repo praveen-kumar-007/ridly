@@ -185,6 +185,7 @@ export const PlayerProvider = ({ children }) => {
       navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
       navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTrack, ytPlayer, queue, currentIndex, isShuffle, isRepeat]); 
 
   return (
