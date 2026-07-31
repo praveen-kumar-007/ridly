@@ -1,0 +1,23 @@
+.resso-equalizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 20px;
+}
+
+.resso-equalizer .bar {
+    width: 4px;
+    background: linear-gradient(to top, var(--primary-color), var(--accent-color));
+    border-radius: 2px;
+    animation: eq-bounce 1s ease-in-out infinite alternate;
+}
+
+.resso-equalizer .bar1 { height: 10px; animation-delay: 0.1s; }
+.resso-equalizer .bar2 { height: 20px; animation-delay: 0.3s; }
+.resso-equalizer .bar3 { height: 15px; animation-delay: 0.2s; }
+.resso-equalizer .bar4 { height: 8px;  animation-delay: 0.4s; }
+
+@keyframes eq-bounce {
+    0% { transform: scaleY(0.3); }
+    100% { transform: scaleY(1); }
+}

@@ -1,0 +1,74 @@
+.tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 20px;
+}
+
+.track-list-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.track-list-item:hover {
+  transform: translateX(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--primary-color);
+}
+
+.track-rank {
+  width: 40px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.track-list-img {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+.track-list-img-placeholder {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-sm);
+  margin-right: 20px;
+  background: var(--bg-color-tertiary);
+}
+
+.track-list-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.track-list-info .track-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.track-list-info .track-artist {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.track-stats {
+  display: flex;
+  align-items: center;
+}
+
+.track-playcount {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  background: var(--bg-color-tertiary);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}

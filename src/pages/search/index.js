@@ -1,45 +1,50 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
-import { getTopTracks } from '../../api';
+import React, { useState, useContext, useRef } from 'react';
+import { searchTracks } from '../../api';
 import { PlayerContext } from '../../context/PlayerContext';
+import { FaSearch } from 'react-icons/fa';
 import SocialActions from '../../components/socialActions';
 import ProgressBar from '../../components/progressBar';
 import Equalizer from '../../components/equalizer';
 import MediaControls from '../../components/mediaControls';
 import '../feed/feed.css';
+import './search.css';
 
-export default function Trend() {
+export default function Search() {
+  const [query, setQuery] = useState('');
   const [tracks, setTracks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [pageToken, setPageToken] = useState('');
+  const [searchedText, setSearchedText] = useState('');
   const { playPlaylist, isPlaying, togglePlay, currentTrack, setQueue } = useContext(PlayerContext);
   const observer = useRef();
 
-  useEffect(() => {
-    const fetchTrending = async (token = '') => {
-      const data = await getTopTracks(token, 15);
-      if (!token) {
-        setTracks(data.tracks);
-        setQueue(data.tracks);
-      } else {
-        setTracks(prev => {
-          const updated = [...prev, ...data.tracks];
-          setQueue(updated);
-          return updated;
-        });
-      }
-      setPageToken(data.nextPageToken);
-      setLoading(false);
-    };
-
-    fetchTrending();
-  }, [setQueue]);
+  const handleSearch = async (e, token = '') => {
+    if (e) e.preventDefault();
+    if (!query) return;
+    
+    setLoading(true);
+    setSearchedText(query);
+    const data = await searchTracks(query, token, 15);
+    if (!token) {
+      setTracks(data.tracks);
+      setQueue(data.tracks);
+    } else {
+      setTracks(prev => {
+        const updated = [...prev, ...data.tracks];
+        setQueue(updated);
+        return updated;
+      });
+    }
+    setPageToken(data.nextPageToken);
+    setLoading(false);
+  };
 
   const lastTrackElementRef = (node) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && pageToken) {
-        getTopTracks(pageToken, 15).then(data => {
+        searchTracks(query, pageToken, 15).then(data => {
             if (data && data.tracks) {
               setTracks(prev => {
                 const updated = [...prev, ...data.tracks];
@@ -62,10 +67,23 @@ export default function Trend() {
 
   return (
     <div className='resso-feed-container'>
+      <div className="search-bar-container">
+        <form onSubmit={handleSearch} className="search-form">
+          <FaSearch className="search-icon" />
+          <input 
+            type="text" 
+            placeholder="Search for songs, artists..." 
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="search-input"
+          />
+        </form>
+      </div>
+
       {loading && tracks.length === 0 ? (
-        <div className="loader">Loading Trending India...</div>
-      ) : (
-        <div className="resso-scroll-snap">
+        <div className="loader">Searching...</div>
+      ) : tracks.length > 0 ? (
+        <div className="resso-scroll-snap" style={{height: 'calc(100% - 80px)'}}>
           {tracks.map((track, index) => {
             const imageUrl = track.image ? track.image[track.image.length - 1]['#text'] : '';
             const isPlayingThis = currentTrack && currentTrack.youtubeId === track.youtubeId;
@@ -95,7 +113,7 @@ export default function Trend() {
                               <Equalizer isPlaying={isPlayingThis && isPlaying} />
                           </div>
                           <h2 className="resso-artist">{track.artist ? track.artist.name : 'Unknown Artist'}</h2>
-                          <p className="resso-reason">Trending in India</p>
+                          <p className="resso-reason">Search Results</p>
                           <MediaControls track={track} />
                       </div>
                   </div>
@@ -103,7 +121,12 @@ export default function Trend() {
               </div>
             );
           })}
+          {tracks.length === 0 && !loading && searchedText && (
+            <div className="loader" style={{color: 'white', zIndex: 10, position: 'relative', textAlign: 'center', marginTop: '40px'}}>No results found for {searchedText}</div>
+          )}
         </div>
+      ) : (
+        <div className="loader">Search for any song to start your Vibe!</div>
       )}
     </div>
   );

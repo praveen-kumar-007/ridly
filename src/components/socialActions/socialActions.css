@@ -1,0 +1,235 @@
+.resso-social-sidebar {
+  position: absolute;
+  right: 20px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  align-items: center;
+  z-index: 10;
+}
+
+.social-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  background: rgba(0,0,0,0.4);
+  padding: 12px;
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+}
+
+.social-action-btn:hover {
+  transform: scale(1.1);
+  background: rgba(0,0,0,0.6);
+}
+
+.social-count {
+  color: white;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+/* Slide Panel */
+.resso-slide-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+}
+
+.resso-slide-panel.open {
+  transform: translateY(0);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: white;
+}
+
+.close-panel {
+  color: white;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+
+.panel-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 30px;
+}
+
+.comment-item {
+  margin-bottom: 15px;
+}
+
+.comment-item strong {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.comment-item p {
+  color: white;
+  margin: 0;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.no-comments {
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 40px;
+}
+
+.comment-form {
+  display: flex;
+  padding: 15px 30px 30px 30px;
+  background: rgba(0,0,0,0.5);
+  gap: 10px;
+}
+
+.comment-form input {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  color: white;
+  outline: none;
+}
+
+.comment-form button {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: white;
+  border-radius: 20px;
+  padding: 0 20px;
+  font-weight: bold;
+}
+
+.lyrics-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lyrics-content h1 {
+  font-size: 2rem;
+  color: white;
+  margin-bottom: 5px;
+}
+
+.lyrics-content h2 {
+  font-size: 1rem;
+  color: var(--primary-color);
+  margin-bottom: 40px;
+}
+
+.mock-lyrics {
+  font-size: 1.5rem;
+  line-height: 1.8;
+  font-weight: bold;
+  color: rgba(255,255,255,0.7);
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Share Panel */
+.share-panel {
+  height: 40%;
+}
+.share-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 40px;
+}
+.share-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+.share-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  color: white;
+}
+.share-icon.whatsapp { background: #25D366; }
+.share-icon.instagram { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%); }
+.share-icon.link { background: #333; }
+.share-option span { color: white; font-size: 0.9rem; font-weight: 500; }
+
+/* Queue Panel */
+.queue-content {
+  padding: 10px 30px;
+}
+.queue-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px 15px;
+  border-radius: 10px;
+}
+.queue-idx {
+  color: var(--text-muted);
+  font-weight: bold;
+  margin-right: 15px;
+  width: 20px;
+}
+.queue-info p { margin: 0; }
+.queue-title { color: white; font-weight: 600; font-size: 1rem; }
+.queue-artist { color: var(--primary-color); font-size: 0.85rem; }
+
+/* Ripple Effect */
+.social-action-btn {
+  position: relative;
+  overflow: hidden;
+}
+span.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 600ms linear;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}

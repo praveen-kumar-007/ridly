@@ -1,24 +1,18 @@
-import React from 'react'
-import './sidebar.css'
-import SidebarButton from './sidebarButton'
-import { AiFillApple, AiFillFileExclamation } from "react-icons/ai";
-import { AiFillGoogleSquare } from "react-icons/ai";
-import { AiFillHome } from "react-icons/ai";
-import { AiFillGithub } from "react-icons/ai";
-import { BsFillArrowDownLeftCircleFill } from 'react-icons/bs';
+import React from 'react';
+import './sidebar.css';
+import SidebarButton from './sidebarButton';
+import { FaSearch, FaFire, FaHeart, FaMusic, FaCompactDisc, FaUser } from 'react-icons/fa';
 
 export default function Sidebar() {
   return (
     <div className='sidebar-container'>
-      <img src='https://cdn.pixabay.com/photo/2021/09/20/03/24/skeleton-6639547_1280.png' alt='profile img' className='profile-img' />
-      <div>
-        <SidebarButton title="Feed" to="./feed" icon={AiFillApple} />
-        <SidebarButton title="Trending" to="/trending" icon={AiFillGithub} />
-        <SidebarButton title="Player" to="/player" icon={AiFillGoogleSquare} />
-        <SidebarButton title="Fav" to="/fav" icon={AiFillHome} />
-        <SidebarButton title="Lib" to="/" icon={BsFillArrowDownLeftCircleFill} />
+      <div className="bottom-nav-links">
+        <SidebarButton title="Feed" to="/feed" icon={FaMusic} />
+        <SidebarButton title="Trending" to="/trend" icon={FaFire} />
+        <SidebarButton title="Mixes" to="/mixes" icon={FaCompactDisc} />
+        <SidebarButton title="Search" to="/search" icon={FaSearch} />
+        <SidebarButton title="Fav" to="/favorites" icon={FaHeart} />
       </div>
-      <SidebarButton title="Sign Out" to="" icon={AiFillFileExclamation} />
     </div>
   )
 }

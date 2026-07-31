@@ -1,0 +1,118 @@
+.global-player {
+  position: absolute;
+  bottom: 20px;
+  left: 2%;
+  width: 96%;
+  height: 90px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 100;
+  border-radius: 20px;
+}
+
+.gp-info {
+  display: flex;
+  align-items: center;
+  width: 30%;
+}
+
+.gp-art {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  margin-right: 16px;
+  object-fit: cover;
+}
+
+.gp-art-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-sm);
+  margin-right: 16px;
+  background: var(--bg-color-tertiary);
+}
+
+.gp-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.gp-title {
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+.gp-artist {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.gp-controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40%;
+}
+
+.gp-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.gp-btn {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  transition: all var(--transition-fast);
+}
+
+.gp-btn:hover {
+  color: var(--text-primary);
+}
+
+.gp-play-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 5px 20px rgba(0, 242, 254, 0.3);
+}
+
+.gp-play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 25px rgba(254, 9, 121, 0.5);
+}
+
+.gp-progress-bg {
+  width: 100%;
+  height: 5px;
+  background: var(--bg-color-tertiary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.gp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: var(--radius-full);
+}
+
+.gp-extra {
+  width: 30%;
+  display: flex;
+  justify-content: flex-end;
+}

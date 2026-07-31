@@ -1,0 +1,161 @@
+.resso-feed-container {
+  height: calc(100vh - 120px); /* minus player and padding */
+  width: 100%;
+  overflow: hidden;
+  border-radius: 20px;
+  background: black;
+}
+
+.resso-scroll-snap {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.resso-scroll-snap::-webkit-scrollbar {
+  display: none; /* Chrome */
+}
+
+.resso-track-card {
+  height: 100%;
+  width: 100%;
+  scroll-snap-align: start;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.resso-bg-blur {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(40px) brightness(0.4);
+  z-index: 0;
+}
+
+.resso-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+}
+
+.resso-art {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  border: 30px solid #111; /* The vinyl black ring */
+  background-color: #111;
+  margin-bottom: 40px;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+/* Optional: vinyl center hole effect via pseudo-element if we wanted, but border is enough for now */
+
+.resso-art.spinning {
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+.resso-info {
+  margin-top: 20px;
+  text-align: left;
+  z-index: 10;
+  width: 100%;
+  max-width: 400px;
+}
+
+.resso-title-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.resso-title {
+  font-size: 2.2rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+}
+
+.resso-artist {
+  font-size: 1.1rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--primary-color);
+  margin: 5px 0 0 0;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+.resso-reason {
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.5);
+  padding: 4px 12px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 10px;
+  backdrop-filter: blur(10px);
+}
+
+.resso-actions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.resso-btn {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.resso-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
+}
+
+.resso-play-btn {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: white;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(254, 9, 121, 0.4);
+  transition: all 0.2s;
+}
+.resso-play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 40px rgba(254, 9, 121, 0.6);
+}

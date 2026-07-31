@@ -1,0 +1,84 @@
+.resso-mixes-container {
+    padding: 30px 20px;
+    background-color: var(--bg-color-main);
+}
+
+.mixes-title {
+    font-size: 2rem;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    color: white;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+.mixes-scroll-area {
+    padding-bottom: 100px;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.mixes-scroll-area::-webkit-scrollbar {
+    display: none;
+}
+
+.category-section {
+    margin-bottom: 40px;
+}
+
+.category-title {
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.mixes-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.mix-card {
+    height: 120px;
+    border-radius: 12px;
+    display: flex;
+    align-items: flex-end;
+    padding: 15px;
+    cursor: pointer;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.mix-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.1) 100%);
+    z-index: 1;
+}
+
+.mix-card h2 {
+    font-size: 1.1rem;
+    font-family: var(--font-body);
+    font-weight: 700;
+    color: white;
+    margin: 0;
+    z-index: 2;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    line-height: 1.2;
+}
+
+.mix-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+}
