@@ -1,5 +1,5 @@
 .settings-container {
-  padding: 40px;
+  padding: 100px 40px 40px 40px; /* Clears the absolute positioned logo and profile icon */
   max-width: 800px;
   margin: 0 auto;
   color: var(--text-primary);
