@@ -7,6 +7,7 @@ import Feed from '../feed/index'
 import Fav from '../fav/index'
 import Search from '../search/index'
 import Login from '../auth/login'
+import Settings from '../settings/index'
 import './home.css'
 import Sidebar from '../../components/sidebar'
 import { PlayerProvider } from '../../context/PlayerContext'
@@ -98,6 +99,7 @@ export default function Home() {
                 <Route path="/feed" element={<Feed/>} />
                 <Route path="/player" element={<Player/>} />
                 <Route path="/trend" element={<Trend/>} />
+                <Route path="/settings" element={<Settings/>} />
               </Routes>
           </div>
           </div>

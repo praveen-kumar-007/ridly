@@ -91,6 +91,11 @@ export const PlayerProvider = ({ children }) => {
     }
   };
 
+  const onError = (event) => {
+    // If the video fails to load or play (due to quota, blocks, etc.), silently skip to the next song
+    nextTrack();
+  };
+
   const playPlaylist = async (tracks, startIndex = 0) => {
     setQueue(tracks);
     setCurrentIndex(startIndex);
@@ -122,7 +127,7 @@ export const PlayerProvider = ({ children }) => {
         }
       }
     } catch (e) {
-      console.error("Taste profile tracker error", e);
+      // Silently ignore taste profile errors
     }
 
     if (!youtubeId) {
@@ -135,7 +140,6 @@ export const PlayerProvider = ({ children }) => {
       setCurrentTrack({ ...track, youtubeId });
       // The `<YouTube videoId={...} />` component will automatically load it.
     } else {
-      console.warn("No audio preview for track", track.name);
       nextTrack();
     }
   };
@@ -248,6 +252,7 @@ export const PlayerProvider = ({ children }) => {
             }}
             onReady={onReady}
             onStateChange={onStateChange}
+            onError={onError}
           />
         </div>
       )}

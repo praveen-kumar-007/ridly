@@ -78,8 +78,8 @@
 }
 
 .vinyl-record {
-  width: 280px;
-  height: 280px;
+  width: clamp(280px, 80vw, 450px);
+  height: clamp(280px, 80vw, 450px);
   border-radius: 50%;
   background: #111;
   border: 8px solid #222;
@@ -106,8 +106,8 @@
 }
 
 .album-art-center {
-  width: 140px;
-  height: 140px;
+  width: 50%;
+  height: 50%;
   border-radius: 50%;
   object-fit: cover;
   z-index: 2;
@@ -291,14 +291,6 @@
     height: 100dvh;
   }
   
-  .vinyl-record {
-    width: 240px;
-    height: 240px;
-  }
-  .album-art-center {
-    width: 120px;
-    height: 120px;
-  }
   .resso-sidebar {
     bottom: 200px;
   }

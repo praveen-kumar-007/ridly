@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { executeWithRotation } from './apiKeyManager';
 
-const YOUTUBE_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
 const BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
 // Maximum Speed In-Memory Cache
@@ -37,16 +37,18 @@ export const getTopTracks = async (pageToken = '', limit = 30) => {
   const cacheKey = `topTracks_${pageToken}_${limit}`;
   return getCachedOrFetch(cacheKey, async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/videos`, {
-          params: {
-            part: 'snippet,statistics',
-            chart: 'mostPopular',
-            regionCode: 'IN',
-            videoCategoryId: '10', // Music
-            maxResults: limit,
-            key: YOUTUBE_KEY,
-            pageToken: pageToken
-          },
+        const response = await executeWithRotation(async (apiKey) => {
+          return await axios.get(`${BASE_URL}/videos`, {
+            params: {
+              part: 'snippet,statistics',
+              chart: 'mostPopular',
+              regionCode: 'IN',
+              videoCategoryId: '10', // Music
+              maxResults: limit,
+              key: apiKey,
+              pageToken: pageToken
+            },
+          });
         });
         
         return {
@@ -54,7 +56,6 @@ export const getTopTracks = async (pageToken = '', limit = 30) => {
             nextPageToken: response.data.nextPageToken
         };
       } catch (error) {
-        console.error('Error fetching top tracks from YouTube:', error);
         return { tracks: [], nextPageToken: null };
       }
   });
@@ -69,16 +70,18 @@ export const searchTracks = async (query, pageToken = '', limit = 30) => {
     }
 
     try {
-        const response = await axios.get(`${BASE_URL}/search`, {
-            params: {
-                part: 'snippet',
-                q: `${query} official audio`,
-                type: 'video',
-                videoCategoryId: '10', // Music
-                maxResults: Math.min(limit * 2, 50), // Fetch more to shuffle well
-                key: YOUTUBE_KEY,
-                pageToken: pageToken
-            },
+        const response = await executeWithRotation(async (apiKey) => {
+            return await axios.get(`${BASE_URL}/search`, {
+                params: {
+                    part: 'snippet',
+                    q: `${query} official audio`,
+                    type: 'video',
+                    videoCategoryId: '10', // Music
+                    maxResults: Math.min(limit * 2, 50), // Fetch more to shuffle well
+                    key: apiKey,
+                    pageToken: pageToken
+                },
+            });
         });
         
         let fetchedTracks = response.data.items.map(normalizeYoutubeVideo);
@@ -103,7 +106,6 @@ export const searchTracks = async (query, pageToken = '', limit = 30) => {
 
         return result;
     } catch (error) {
-        console.error('Error searching tracks from YouTube:', error);
         return { tracks: [], nextPageToken: null };
     }
 };
@@ -114,7 +116,9 @@ export const getYoutubeVideoId = async (trackName, artistName) => {
 
     try {
         const query = encodeURIComponent(`${trackName} ${artistName} official audio`);
-        const response = await axios.get(`${BASE_URL}/search?part=snippet&q=${query}&type=video&key=${YOUTUBE_KEY}`);
+        const response = await executeWithRotation(async (apiKey) => {
+            return await axios.get(`${BASE_URL}/search?part=snippet&q=${query}&type=video&key=${apiKey}`);
+        });
         if (response.data && response.data.items && response.data.items.length > 0) {
             const id = response.data.items[0].id.videoId;
             apiCache.set(cacheKey, id);
@@ -122,7 +126,6 @@ export const getYoutubeVideoId = async (trackName, artistName) => {
         }
         return null;
     } catch (error) {
-        console.error('Error fetching YouTube video:', error);
         return null;
     }
 };

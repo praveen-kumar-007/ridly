@@ -1,7 +1,7 @@
 import React from 'react';
 import './sidebar.css';
 import SidebarButton from './sidebarButton';
-import { FaSearch, FaFire, FaHeart, FaMusic, FaCompactDisc, FaPlayCircle } from 'react-icons/fa';
+import { FaSearch, FaFire, FaHeart, FaMusic, FaCompactDisc, FaPlayCircle, FaCog } from 'react-icons/fa';
 
 export default function Sidebar() {
   return (
@@ -13,6 +13,7 @@ export default function Sidebar() {
         <SidebarButton title="Player" to="/player" icon={FaPlayCircle} />
         <SidebarButton title="Search" to="/search" icon={FaSearch} />
         <SidebarButton title="Fav" to="/favorites" icon={FaHeart} />
+        <SidebarButton title="Settings" to="/settings" icon={FaCog} />
       </div>
     </div>
   )
