@@ -14,8 +14,10 @@ export default function Feed() {
   const [pageToken, setPageToken] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [topArtistName, setTopArtistName] = useState('');
-  const { playPlaylist, isPlaying, togglePlay, currentTrack, setQueue } = useContext(PlayerContext);
+  const { playPlaylist, isPlaying, togglePlay, currentTrack, setQueue, isLoadingQueueTrack } = useContext(PlayerContext);
   const observer = useRef();
+  const autoPlayObserver = useRef();
+  const cardRefs = useRef([]);
   const location = useLocation();
 
   useEffect(() => {
@@ -93,11 +95,31 @@ export default function Feed() {
     if (node) observer.current.observe(node);
   };
 
-  const handleTrackVisible = (index) => {
-    if (currentTrack?.youtubeId !== tracks[index]?.youtubeId) {
-        playPlaylist(tracks, index);
-    }
-  };
+  // Auto-play observer to play music automatically when card enters viewport
+  useEffect(() => {
+    if (autoPlayObserver.current) autoPlayObserver.current.disconnect();
+    
+    autoPlayObserver.current = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const index = Number(entry.target.dataset.index);
+          const trackToPlay = tracks[index];
+          // Ensure we don't restart if already playing this track
+          if (trackToPlay && currentTrack?.youtubeId !== trackToPlay.youtubeId) {
+             playPlaylist(tracks, index);
+          }
+        }
+      });
+    }, { threshold: 0.6 }); // Trigger when 60% of the card is visible
+
+    cardRefs.current.forEach(card => {
+      if (card) autoPlayObserver.current.observe(card);
+    });
+
+    return () => {
+      if (autoPlayObserver.current) autoPlayObserver.current.disconnect();
+    };
+  }, [tracks, currentTrack, playPlaylist]);
 
   return (
     <div className='resso-feed-container'>
@@ -114,24 +136,32 @@ export default function Feed() {
               <div 
                 className="resso-track-card" 
                 key={`${track.youtubeId}-${index}`}
-                ref={isLast ? lastTrackElementRef : null}
-                onMouseEnter={() => handleTrackVisible(index)}
+                data-index={index}
+                ref={(node) => {
+                  if (isLast) lastTrackElementRef(node);
+                  cardRefs.current[index] = node;
+                }}
               >
                   <div className="resso-bg-blur" style={{ backgroundImage: `url(${imageUrl})` }}></div>
                   <SocialActions track={track} />
                   
                   <div className="resso-content">
-                      <img 
-                        src={imageUrl} 
-                        alt={track.name} 
-                        className={`resso-art ${isPlayingThis && isPlaying ? 'spinning' : ''}`} 
-                        onClick={() => isPlayingThis ? togglePlay() : playPlaylist(tracks, index)}
-                      />
+                      <div className="resso-art-container" onClick={() => isPlayingThis ? togglePlay() : playPlaylist(tracks, index)}>
+                        <img 
+                          src={imageUrl} 
+                          alt={track.name} 
+                          className={`resso-art ${isPlayingThis && isPlaying && !isLoadingQueueTrack ? 'spinning' : ''}`} 
+                          style={{ opacity: isLoadingQueueTrack && isPlayingThis ? 0.5 : 1 }}
+                        />
+                        {isLoadingQueueTrack && isPlayingThis && (
+                           <div className="loading-spinner">Loading...</div>
+                        )}
+                      </div>
                       
                       <div className="resso-info">
                           <div className="resso-title-container">
                               <h1 className="resso-title">{track.name}</h1>
-                              <Equalizer isPlaying={isPlayingThis && isPlaying} />
+                              <Equalizer isPlaying={isPlayingThis && isPlaying && !isLoadingQueueTrack} />
                           </div>
                           <h2 className="resso-artist">{track.artist ? track.artist.name || track.artist : 'Unknown Artist'}</h2>
                           <p className="resso-reason">{topArtistName}</p>

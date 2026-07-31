@@ -22,6 +22,7 @@
   height: 100%;
   width: 100%;
   scroll-snap-align: start;
+  scroll-snap-stop: always; /* Prevents multiple scrolling at once */
   position: relative;
   display: flex;
   align-items: center;
@@ -53,6 +54,13 @@
   padding: 40px;
 }
 
+.resso-art-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .resso-art {
   width: 280px;
   height: 280px;
@@ -62,8 +70,24 @@
   border: 30px solid #111; /* The vinyl black ring */
   background-color: #111;
   margin-bottom: 40px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease;
   position: relative;
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  background: rgba(0,0,0,0.6);
+  padding: 10px 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  pointer-events: none;
+  z-index: 10;
 }
 
 /* Optional: vinyl center hole effect via pseudo-element if we wanted, but border is enough for now */
