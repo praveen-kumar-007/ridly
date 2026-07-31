@@ -37,3 +37,12 @@
 .search-input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
+
+@media (min-width: 768px) {
+  .search-bar-container {
+    width: 100%;
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

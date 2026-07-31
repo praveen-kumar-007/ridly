@@ -208,4 +208,22 @@
 @keyframes slideUpSheet {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+/* Desktop & Tablet Responsiveness */
+@media (min-width: 768px) {
+  .main-body {
+      width: calc(100vw - 120px); /* 120px mini sidebar for tablet */
+      margin-left: 120px;
+  }
+  .main-content {
+      width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .main-body {
+      width: calc(100vw - 250px); /* 250px full sidebar for desktop */
+      margin-left: 250px;
+  }
 }
