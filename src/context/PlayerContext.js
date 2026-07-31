@@ -161,6 +161,32 @@ export const PlayerProvider = ({ children }) => {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
+  // MediaSession API for lock screen and background playback
+  useEffect(() => {
+    if ('mediaSession' in navigator && currentTrack) {
+      const artistName = typeof currentTrack.artist === 'string' ? currentTrack.artist : (currentTrack.artist?.name || 'Unknown');
+      const imgUrl = currentTrack.image && currentTrack.image.length > 0 ? currentTrack.image[currentTrack.image.length - 1]['#text'] : '';
+      
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentTrack.name,
+        artist: artistName,
+        album: 'Ravixa Music',
+        artwork: [
+          { src: imgUrl || 'https://ravixa.vercel.app/logo.png', sizes: '512x512', type: 'image/png' }
+        ]
+      });
+
+      navigator.mediaSession.setActionHandler('play', () => {
+         if (ytPlayer) ytPlayer.playVideo();
+      });
+      navigator.mediaSession.setActionHandler('pause', () => {
+         if (ytPlayer) ytPlayer.pauseVideo();
+      });
+      navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
+      navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
+    }
+  }, [currentTrack, ytPlayer, queue, currentIndex, isShuffle, isRepeat]); 
+
   return (
     <PlayerContext.Provider value={{
       queue,
@@ -192,6 +218,7 @@ export const PlayerProvider = ({ children }) => {
               playerVars: {
                 autoplay: 1, // Auto-play when video loads
                 controls: 0, // Hide controls
+                playsinline: 1, // Crucial for iOS background playback
               }
             }}
             onReady={onReady}
