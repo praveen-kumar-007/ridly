@@ -151,6 +151,22 @@ export default function Settings() {
           )}
         </div>
       </div>
+
+      <div className="settings-section glass-panel">
+        <h2><span role="img" aria-label="help">💡</span> How to get a YouTube API Key?</h2>
+        <div className="help-instructions">
+          <p>Follow these quick steps to generate a free YouTube Data API v3 key:</p>
+          <ol>
+            <li>Go to the <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer">Google Cloud Console</a>.</li>
+            <li>Select your project from the top dropdown menu (or create a new one).</li>
+            <li>In the top search bar, search for <strong>YouTube Data API v3</strong> and click <strong>Enable</strong>.</li>
+            <li>On the left sidebar menu, go to <strong>APIs & Services &gt; Credentials</strong>.</li>
+            <li>Click the blue <strong>+ CREATE CREDENTIALS</strong> button at the top and select <strong>API Key</strong>.</li>
+            <li>A popup will appear with your new API key. Copy it and paste it into the field above!</li>
+          </ol>
+          <p className="help-note">Note: YouTube gives you 10,000 units of quota per day for free. If you hit the limit, you can generate another key using a different Google account and add it here!</p>
+        </div>
+      </div>
     </div>
   );
 }
