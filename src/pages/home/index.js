@@ -99,10 +99,10 @@ export default function Home() {
                 <Route path="/player" element={<Player/>} />
                 <Route path="/trend" element={<Trend/>} />
               </Routes>
-            </div>
           </div>
-          <Sidebar /> {/* Now acting as bottom nav */}
+          </div>
         </div>
+        <Sidebar /> {/* Moved outside main-body to fix mobile positioning */}
       </Router>
     </PlayerProvider>
   )
