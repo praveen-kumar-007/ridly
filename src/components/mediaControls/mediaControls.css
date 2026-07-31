@@ -5,13 +5,11 @@
     gap: 30px;
     margin-top: 25px;
     opacity: 0.5;
-    pointer-events: none; /* Disabled when not playing */
     transition: opacity 0.3s;
 }
 
 .media-controls-overlay.active {
     opacity: 1;
-    pointer-events: auto;
 }
 
 .control-btn {
