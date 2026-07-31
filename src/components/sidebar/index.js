@@ -10,9 +10,9 @@ export default function Sidebar() {
         <SidebarButton title="Feed" to="/feed" icon={FaMusic} />
         <SidebarButton title="Trending" to="/trend" icon={FaFire} />
         <SidebarButton title="Mixes" to="/mixes" icon={FaCompactDisc} />
+        <SidebarButton title="Player" to="/player" icon={FaPlayCircle} />
         <SidebarButton title="Search" to="/search" icon={FaSearch} />
         <SidebarButton title="Fav" to="/favorites" icon={FaHeart} />
-        <SidebarButton title="Player" to="/player" icon={FaPlayCircle} />
       </div>
     </div>
   )
