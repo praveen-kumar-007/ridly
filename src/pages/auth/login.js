@@ -36,6 +36,7 @@ export default function Login({ onLogin }) {
     <GoogleOAuthProvider clientId={clientId}>
       <div className='login-page'>
         <div className="login-card glass-panel">
+          <img src="/logo.png" alt="Ravixa Logo" className="login-brand-logo" />
           <h1 className="login-title">Welcome to Ravixa</h1>
           <p className="login-subtitle">Sign in to synchronize your premium taste profile</p>
           <div className="google-btn-container" style={{ marginTop: '20px' }}>

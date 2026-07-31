@@ -40,6 +40,11 @@ export default function Home() {
     <PlayerProvider>
       <Router>
         <div className='main-body'>
+          {/* Top Left Brand Logo */}
+          <div className="top-left-brand">
+            <img src="/logo.png" alt="Ravixa Music" />
+          </div>
+
           {/* Top Right Profile Button */}
           <div 
              className="top-right-profile" 
