@@ -3,16 +3,54 @@ import { executeWithRotation } from './apiKeyManager';
 
 const BASE_URL = 'https://www.googleapis.com/youtube/v3';
 
-// Maximum Speed In-Memory Cache
-const apiCache = new Map();
+// Maximum Speed In-Memory Cache (Fallback)
+const memoryCache = new Map();
+
+// 24 hours in milliseconds
+const CACHE_EXPIRATION = 24 * 60 * 60 * 1000; 
+
+const setCache = (key, data) => {
+    memoryCache.set(key, { data, timestamp: Date.now() });
+    try {
+        const cacheItem = { data, timestamp: Date.now() };
+        localStorage.setItem(`ridly_api_${key}`, JSON.stringify(cacheItem));
+    } catch (e) {
+        // Silently ignore localStorage quota exceeded
+    }
+};
+
+const getCache = (key) => {
+    const now = Date.now();
+    if (memoryCache.has(key)) {
+        const item = memoryCache.get(key);
+        if (now - item.timestamp < CACHE_EXPIRATION) return item.data;
+        memoryCache.delete(key);
+    }
+    try {
+        const storedStr = localStorage.getItem(`ridly_api_${key}`);
+        if (storedStr) {
+            const item = JSON.parse(storedStr);
+            if (now - item.timestamp < CACHE_EXPIRATION) {
+                memoryCache.set(key, item);
+                return item.data;
+            } else {
+                localStorage.removeItem(`ridly_api_${key}`);
+            }
+        }
+    } catch (e) {}
+    return null;
+};
 
 const getCachedOrFetch = async (cacheKey, fetchCallback) => {
-    if (apiCache.has(cacheKey)) {
-        return apiCache.get(cacheKey);
-    }
+    if (!cacheKey) return await fetchCallback();
+    
+    const cachedData = getCache(cacheKey);
+    if (cachedData) return cachedData;
+
     const data = await fetchCallback();
-    if (data && data.tracks && data.tracks.length > 0) {
-        apiCache.set(cacheKey, data);
+    // Cache if it's a valid tracks response or a string (video ID)
+    if (data && ((data.tracks && data.tracks.length > 0) || typeof data === 'string')) {
+        setCache(cacheKey, data);
     }
     return data;
 };
@@ -65,8 +103,9 @@ export const searchTracks = async (query, pageToken = '', limit = 30) => {
     // Only cache the initial loads (no pageToken) to ensure freshness of pagination but speed up initial vibe clicks
     const cacheKey = pageToken ? null : `search_${query}_${limit}`;
     
-    if (cacheKey && apiCache.has(cacheKey)) {
-        return apiCache.get(cacheKey);
+    const cachedData = cacheKey ? getCache(cacheKey) : null;
+    if (cachedData) {
+        return cachedData;
     }
 
     try {
@@ -101,7 +140,7 @@ export const searchTracks = async (query, pageToken = '', limit = 30) => {
         };
 
         if (cacheKey && result.tracks.length > 0) {
-            apiCache.set(cacheKey, result);
+            setCache(cacheKey, result);
         }
 
         return result;
@@ -112,7 +151,8 @@ export const searchTracks = async (query, pageToken = '', limit = 30) => {
 
 export const getYoutubeVideoId = async (trackName, artistName) => {
     const cacheKey = `videoId_${trackName}_${artistName}`;
-    if (apiCache.has(cacheKey)) return apiCache.get(cacheKey);
+    const cachedId = getCache(cacheKey);
+    if (cachedId) return cachedId;
 
     try {
         const query = encodeURIComponent(`${trackName} ${artistName} official audio`);
@@ -121,7 +161,7 @@ export const getYoutubeVideoId = async (trackName, artistName) => {
         });
         if (response.data && response.data.items && response.data.items.length > 0) {
             const id = response.data.items[0].id.videoId;
-            apiCache.set(cacheKey, id);
+            setCache(cacheKey, id);
             return id;
         }
         return null;

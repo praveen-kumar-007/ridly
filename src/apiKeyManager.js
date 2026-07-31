@@ -3,15 +3,30 @@ import { db } from './firebase';
 import CryptoJS from 'crypto-js';
 
 let keysCache = [];
+try {
+  const stored = localStorage.getItem('ridly_cached_keys');
+  if (stored) keysCache = JSON.parse(stored);
+} catch(e) {}
+
 let currentKeyIndex = 0;
 let isFetchingKeys = false;
 let fetchKeysPromise = null;
-
+let hasSynced = false;
 
 export const loadApiKeys = async () => {
-  if (keysCache.length > 0) return keysCache;
+  if (keysCache.length > 0) {
+    if (!hasSynced) {
+      hasSynced = true;
+      syncApiKeysBackground(); 
+    }
+    return keysCache;
+  }
+  
   if (isFetchingKeys && fetchKeysPromise) return fetchKeysPromise;
+  return await syncApiKeysBackground();
+};
 
+const syncApiKeysBackground = () => {
   isFetchingKeys = true;
   fetchKeysPromise = new Promise(async (resolve) => {
     try {
@@ -30,22 +45,21 @@ export const loadApiKeys = async () => {
                   if (originalKey) {
                     fetchedKeys.push(originalKey);
                   }
-                } else {
-                  // Silently ignore missing secret
                 }
-             } catch (e) {
-                // Silently ignore decryption failures
-             }
+             } catch (e) {}
           }
         });
         if (fetchedKeys.length > 0) {
           keysCache = fetchedKeys;
+          try {
+            localStorage.setItem('ridly_cached_keys', JSON.stringify(fetchedKeys));
+          } catch(e) {}
         }
       } 
-    } catch (error) {
-    }
+    } catch (error) {}
     
     isFetchingKeys = false;
+    hasSynced = true;
     resolve(keysCache);
   });
   
