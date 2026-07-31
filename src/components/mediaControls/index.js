@@ -3,7 +3,7 @@ import { PlayerContext } from '../../context/PlayerContext';
 import { FaStepBackward, FaStepForward, FaRandom, FaRedoAlt, FaPlay, FaPause } from 'react-icons/fa';
 import './mediaControls.css';
 
-export default function MediaControls({ track }) {
+export default function MediaControls({ track, onPlay }) {
   const { currentTrack, nextTrack, prevTrack, isShuffle, toggleShuffle, isRepeat, toggleRepeat, togglePlay, isPlaying } = useContext(PlayerContext);
   
   // Only show active controls if this is the currently playing track
@@ -27,6 +27,15 @@ export default function MediaControls({ track }) {
     button.appendChild(circle);
   };
 
+  const handlePlayPause = (e) => {
+      createRipple(e);
+      if (onPlay) {
+          onPlay();
+      } else {
+          togglePlay();
+      }
+  };
+
   return (
     <div className={`media-controls-overlay ${isActive ? 'active' : ''}`}>
         <div className="control-btn" onClick={(e) => { createRipple(e); toggleShuffle(); }}>
@@ -38,7 +47,7 @@ export default function MediaControls({ track }) {
         </div>
         
         {/* Play/Pause Button */}
-        <div className="control-btn play-pause-btn" onClick={(e) => { createRipple(e); togglePlay(); }} style={{ transform: 'scale(1.3)', margin: '0 15px' }}>
+        <div className="control-btn play-pause-btn" onClick={handlePlayPause} style={{ transform: 'scale(1.3)', margin: '0 15px' }}>
            {isActive && isPlaying ? (
               <FaPause color="var(--primary-color)" size={28} />
            ) : (

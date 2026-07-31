@@ -181,7 +181,7 @@ export default function Feed() {
                           </div>
                           <h2 className="resso-artist">{track.artist ? track.artist.name || track.artist : 'Unknown Artist'}</h2>
                           <p className="resso-reason">{topArtistName}</p>
-                          <MediaControls track={track} />
+                          <MediaControls track={track} onPlay={() => isPlayingThis ? togglePlay() : playPlaylist(tracks, index)} />
                       </div>
                   </div>
                   <ProgressBar track={track} />
