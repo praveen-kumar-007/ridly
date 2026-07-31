@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import Lib from '../lib/index'
 import Player from '../player/index'
 import Trend from '../trend/index'
@@ -73,16 +73,32 @@ export default function Home() {
                   <p className="sheet-message">
                     {user?.isGuest 
                       ? 'Sign in to Ravixa to unlock personalized recommendations, sync your favorites, and join the community.' 
-                      : 'Are you sure you want to log out of your account?'}
+                      : 'Manage your taste profile, configure API settings, or sign out of your account.'}
                   </p>
                 </div>
 
                 <div className="sheet-actions">
-                  <button className="sheet-btn primary-btn" onClick={handleAuthAction}>
-                    {user?.isGuest ? 'Log In to Ravixa' : 'Log Out'}
+                  <Link 
+                    to="/settings" 
+                    className="sheet-btn secondary-btn" 
+                    style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}} 
+                    onClick={() => setShowProfileModal(false)}
+                  >
+                    ⚙️ API Settings
+                  </Link>
+                  <button 
+                    className="sheet-btn primary-btn" 
+                    style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}} 
+                    onClick={handleAuthAction}
+                  >
+                    {user?.isGuest ? '🔑 Log In to Ravixa' : '🚪 Log Out'}
                   </button>
-                  <button className="sheet-btn secondary-btn" onClick={() => setShowProfileModal(false)}>
-                    Cancel
+                  <button 
+                    className="sheet-btn secondary-btn" 
+                    style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}} 
+                    onClick={() => setShowProfileModal(false)}
+                  >
+                    ❌ Cancel
                   </button>
                 </div>
               </div>
