@@ -111,12 +111,25 @@ export const PlayerProvider = ({ children }) => {
   };
 
   const loadTrackIntoPlayer = async (track) => {
+    if (!track) return;
+
+    // Immediately stop old video and audio
+    if (ytPlayer) {
+      try { ytPlayer.pauseVideo(); } catch (e) {}
+    }
+    if (audioRef.current) {
+      try { audioRef.current.pause(); } catch (e) {}
+    }
+
+    // Immediately update current track so UI title/artwork changes right away
+    setCurrentTrack(track);
     setIsLoadingQueueTrack(true);
     setIsPlaying(false);
     setProgress(0);
     setCurrentTime(0);
-    setStartTime(0); // Reset saved time for fresh tracks
-    
+    setStartTime(0);
+    localStorage.removeItem('ridly_time');
+
     let youtubeId = track.youtubeId;
     const artistName = typeof track.artist === 'string' ? track.artist : (track.artist?.name || 'Unknown');
 
@@ -129,24 +142,31 @@ export const PlayerProvider = ({ children }) => {
           const historyKey = `ridly_play_history_${user.email}`;
           const historyStr = localStorage.getItem(historyKey) || '[]';
           let history = JSON.parse(historyStr);
-          history.unshift(artistName); // Add to front
-          history = history.slice(0, 50); // Keep last 50 plays
+          history.unshift(artistName);
+          history = history.slice(0, 50);
           localStorage.setItem(historyKey, JSON.stringify(history));
         }
       }
-    } catch (e) {
-      // Silently ignore taste profile errors
-    }
+    } catch (e) {}
 
     if (!youtubeId) {
       youtubeId = await getYoutubeVideoId(track.name, artistName);
     }
-    
+
     setIsLoadingQueueTrack(false);
-    
+
     if (youtubeId) {
-      setCurrentTrack({ ...track, youtubeId });
-      // The `<YouTube videoId={...} />` component will automatically load it.
+      const updatedTrack = { ...track, youtubeId };
+      setCurrentTrack(updatedTrack);
+
+      // Force YouTube player to load and play the new video ID immediately
+      if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+        try {
+          ytPlayer.loadVideoById(youtubeId);
+          setIsPlaying(true);
+          if (audioRef.current) audioRef.current.play().catch(() => {});
+        } catch (e) {}
+      }
     } else {
       nextTrack();
     }

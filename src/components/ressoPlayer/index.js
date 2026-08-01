@@ -131,9 +131,13 @@ export default function RessoPlayer({ tracks = [], onLoadMore }) {
     setNewComment('');
   };
 
-  const handlePlayPause = (e) => {
+  const handleCardClick = (e, cardIndex) => {
     e.stopPropagation();
-    togglePlay();
+    if (currentIndex !== cardIndex) {
+      playPlaylist(tracks, cardIndex);
+    } else {
+      togglePlay();
+    }
     setShowPlayIcon(true);
     setTimeout(() => setShowPlayIcon(false), 800);
   };
@@ -160,7 +164,7 @@ export default function RessoPlayer({ tracks = [], onLoadMore }) {
               key={`${track.youtubeId || track.name}-${index}`}
               data-index={index}
               ref={(node) => { cardRefs.current[index] = node; }}
-              onClick={handlePlayPause}
+              onClick={(e) => handleCardClick(e, index)}
             >
                 {/* Background Blur */}
                 <div className="resso-bg-blur" style={{ backgroundImage: `url(${imageUrl})` }}></div>
