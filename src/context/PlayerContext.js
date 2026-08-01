@@ -73,9 +73,11 @@ export const PlayerProvider = ({ children }) => {
     if (event.data === 1) {
       setIsPlaying(true);
       if (audioRef.current) audioRef.current.play().catch(()=>{});
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     } else if (event.data === 2) {
       setIsPlaying(false);
       if (audioRef.current) audioRef.current.pause();
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     } else if (event.data === 0) {
       if (audioRef.current) audioRef.current.pause();
       if (isRepeat) {
@@ -210,31 +212,60 @@ export const PlayerProvider = ({ children }) => {
   // MediaSession API for lock screen and background playback
   useEffect(() => {
     if ('mediaSession' in navigator && currentTrack) {
-      const artistName = typeof currentTrack.artist === 'string' ? currentTrack.artist : (currentTrack.artist?.name || 'Unknown');
-      const imgUrl = currentTrack.image && currentTrack.image.length > 0 ? currentTrack.image[currentTrack.image.length - 1]['#text'] : '';
+      const artistName = typeof currentTrack.artist === 'string' ? currentTrack.artist : (currentTrack.artist?.name || 'Ravixa Artist');
+      const imgUrl = currentTrack.image && currentTrack.image.length > 0 ? (currentTrack.image[currentTrack.image.length - 1]['#text'] || currentTrack.image[0]['#text']) : '';
       
       navigator.mediaSession.metadata = new MediaMetadata({
         title: currentTrack.name,
         artist: artistName,
         album: 'Ravixa Music',
         artwork: [
-          { src: imgUrl || 'https://ravixa.vercel.app/logo.png', sizes: '512x512', type: 'image/png' }
+          { src: imgUrl || 'https://ravixa.vercel.app/logo.png', sizes: '512x512', type: 'image/png' },
+          { src: imgUrl || 'https://ravixa.vercel.app/logo.png', sizes: '256x256', type: 'image/png' },
+          { src: imgUrl || 'https://ravixa.vercel.app/logo.png', sizes: '128x128', type: 'image/png' }
         ]
       });
 
-      navigator.mediaSession.setActionHandler('play', () => {
-         if (ytPlayer) ytPlayer.playVideo();
-         if (audioRef.current) audioRef.current.play().catch(()=>{});
+      const safeSetHandler = (action, handler) => {
+        try { navigator.mediaSession.setActionHandler(action, handler); } catch (e) {}
+      };
+
+      safeSetHandler('play', () => {
+        if (ytPlayer) ytPlayer.playVideo();
+        if (audioRef.current) audioRef.current.play().catch(()=>{});
+        setIsPlaying(true);
       });
-      navigator.mediaSession.setActionHandler('pause', () => {
-         if (ytPlayer) ytPlayer.pauseVideo();
-         if (audioRef.current) audioRef.current.pause();
+
+      safeSetHandler('pause', () => {
+        if (ytPlayer) ytPlayer.pauseVideo();
+        if (audioRef.current) audioRef.current.pause();
+        setIsPlaying(false);
       });
-      navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
-      navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
+
+      safeSetHandler('previoustrack', prevTrack);
+      safeSetHandler('nexttrack', nextTrack);
+
+      safeSetHandler('seekto', (details) => {
+        if (details.seekTime !== undefined && duration > 0) {
+          seek((details.seekTime / duration) * 100);
+        }
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTrack, ytPlayer, queue, currentIndex, isShuffle, isRepeat]); 
+  }, [currentTrack, ytPlayer, queue, currentIndex, isShuffle, isRepeat, duration]);
+
+  // Keep Lock Screen Position State updated in real time
+  useEffect(() => {
+    if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession && duration > 0) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: Math.max(duration, 1),
+          playbackRate: 1,
+          position: Math.min(Math.max(currentTime, 0), duration)
+        });
+      } catch (e) {}
+    }
+  }, [currentTime, duration]); 
 
   return (
     <PlayerContext.Provider value={{
@@ -262,7 +293,7 @@ export const PlayerProvider = ({ children }) => {
       {children}
       <audio 
         ref={audioRef} 
-        src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==" 
+        src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAACAAAMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDD/4BMgAAAAAANAAAAAAAAMAAAAAAAABAAAAAA" 
         loop 
         playsInline 
         style={{ display: 'none' }} 
