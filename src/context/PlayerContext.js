@@ -20,6 +20,7 @@ export const PlayerProvider = ({ children }) => {
   });
 
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isUserPaused, setIsUserPaused] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(() => startTime);
@@ -72,9 +73,20 @@ export const PlayerProvider = ({ children }) => {
     // 0 = ended, 1 = playing, 2 = paused
     if (event.data === 1) {
       setIsPlaying(true);
+      setIsUserPaused(false);
       if (audioRef.current) audioRef.current.play().catch(()=>{});
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     } else if (event.data === 2) {
+      // If screen is locked or document is hidden and user didn't manually pause, force resume!
+      if ((document.hidden || document.visibilityState === 'hidden') && !isUserPaused) {
+        try {
+          event.target.playVideo();
+          if (audioRef.current) audioRef.current.play().catch(()=>{});
+          if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+        } catch(e) {}
+        return;
+      }
+
       setIsPlaying(false);
       if (audioRef.current) audioRef.current.pause();
       if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
@@ -91,11 +103,17 @@ export const PlayerProvider = ({ children }) => {
   const togglePlay = () => {
     if (!ytPlayer || !currentTrack) return;
     if (isPlaying) {
+      setIsUserPaused(true);
+      setIsPlaying(false);
       ytPlayer.pauseVideo();
       if (audioRef.current) audioRef.current.pause();
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
     } else {
+      setIsUserPaused(false);
+      setIsPlaying(true);
       ytPlayer.playVideo();
       if (audioRef.current) audioRef.current.play().catch(()=>{});
+      if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
     }
   };
 
@@ -125,6 +143,7 @@ export const PlayerProvider = ({ children }) => {
     setCurrentTrack(track);
     setIsLoadingQueueTrack(true);
     setIsPlaying(false);
+    setIsUserPaused(false);
     setProgress(0);
     setCurrentTime(0);
     setStartTime(0);
@@ -251,15 +270,17 @@ export const PlayerProvider = ({ children }) => {
       };
 
       safeSetHandler('play', () => {
+        setIsUserPaused(false);
+        setIsPlaying(true);
         if (ytPlayer) ytPlayer.playVideo();
         if (audioRef.current) audioRef.current.play().catch(()=>{});
-        setIsPlaying(true);
       });
 
       safeSetHandler('pause', () => {
+        setIsUserPaused(true);
+        setIsPlaying(false);
         if (ytPlayer) ytPlayer.pauseVideo();
         if (audioRef.current) audioRef.current.pause();
-        setIsPlaying(false);
       });
 
       safeSetHandler('previoustrack', prevTrack);
@@ -285,7 +306,31 @@ export const PlayerProvider = ({ children }) => {
         });
       } catch (e) {}
     }
-  }, [currentTime, duration]); 
+  }, [currentTime, duration]);
+
+  // Lock Screen & Background Playback Protection Listener
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if ((document.hidden || document.visibilityState === 'hidden') && isPlaying && !isUserPaused) {
+        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+          try { ytPlayer.playVideo(); } catch (e) {}
+        }
+        if (audioRef.current) {
+          audioRef.current.play().catch(() => {});
+        }
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.playbackState = 'playing';
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleVisibilityChange);
+    };
+  }, [isPlaying, isUserPaused, ytPlayer]); 
 
   return (
     <PlayerContext.Provider value={{
