@@ -1,0 +1,465 @@
+.resso-feed-container {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #09090b;
+  position: relative;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.resso-scroll-snap {
+  height: 100%;
+  width: 100%;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.resso-scroll-snap::-webkit-scrollbar {
+  display: none; /* Chrome */
+}
+
+.resso-track-card {
+  height: 100%;
+  width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.resso-bg-blur {
+  position: absolute;
+  top: -15%;
+  left: -15%;
+  width: 130%;
+  height: 130%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(50px) brightness(0.28) saturate(1.3);
+  z-index: 0;
+  transform: scale(1.1);
+}
+
+.ambient-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255,0,85,0.18), transparent 70%),
+              radial-gradient(circle at 80% 80%, rgba(0,242,254,0.12), transparent 70%),
+              linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.resso-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+/* Top Header Bar Tabs (Frameless Premium Floating Tabs) */
+.resso-top-header {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+  white-space: nowrap;
+}
+
+.header-tab {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.header-tab:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.header-tab.active {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  text-shadow: 0 0 10px rgba(255, 0, 85, 0.6);
+}
+
+.header-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 2.5px;
+  background: #ff0055;
+  border-radius: 2px;
+  box-shadow: 0 0 8px #ff0055;
+}
+
+/* Center Album Art (Perfectly Center-Aligned in Viewport) */
+.resso-main-art {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.vinyl-record {
+  width: clamp(210px, 55vw, 255px);
+  height: clamp(210px, 55vw, 255px);
+  border-radius: 50%;
+  border: 9px solid rgba(20, 20, 25, 0.95);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 0 20px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.album-art-center {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.spinning { animation: spin 10s linear infinite; }
+.paused { animation-play-state: paused; transform: scale(0.96); }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* Audio Ripples */
+.ripple-container {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ripple {
+  position: absolute;
+  width: clamp(220px, 58vw, 265px);
+  height: clamp(220px, 58vw, 265px);
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 0, 85, 0.45);
+  animation: rippleEffect 2.4s linear infinite;
+  opacity: 0;
+}
+.ripple-1 { animation-delay: 0s; }
+.ripple-2 { animation-delay: 0.8s; }
+.ripple-3 { animation-delay: 1.6s; }
+
+@keyframes rippleEffect {
+  0% { transform: scale(1); opacity: 0.6; border-width: 3px; }
+  100% { transform: scale(1.38); opacity: 0; border-width: 1px; }
+}
+
+/* Floating On-Screen Live Lyrics (No Box Collision!) */
+.on-screen-lyrics-container {
+  position: absolute;
+  bottom: 255px;
+  left: 18px;
+  right: 75px; /* Clear gap from right sidebar at right: 14px */
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.lyric-line-prev {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 400;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.35s ease;
+}
+
+.lyric-line-active {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ff0055;
+  text-shadow: 0 0 12px rgba(255, 0, 85, 0.7), 0 2px 8px rgba(0,0,0,0.9);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: scale(1.02);
+  transform-origin: left center;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lyric-line-next {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.35s ease;
+}
+
+/* Full Lyrics View Mode (When 'Lyrics' tab is active) */
+.full-lyrics-overlay {
+  position: absolute;
+  top: 75px;
+  bottom: 250px;
+  left: 20px;
+  right: 75px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  z-index: 12;
+  overflow-y: auto;
+}
+
+.full-lyric-line {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.full-lyric-line:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.full-lyric-line.current {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #ff0055;
+  text-shadow: 0 0 14px rgba(255, 0, 85, 0.8);
+  transform: scale(1.04);
+  transform-origin: left center;
+}
+
+/* Right Sidebar (Like, Comment, Share, Queue, Add) */
+.resso-sidebar {
+  position: absolute;
+  right: 14px;
+  bottom: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 10;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.action-item:hover { transform: scale(1.08); }
+.action-item:active { transform: scale(0.92); }
+
+.action-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.action-item span {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.1px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* Bottom Info */
+.resso-bottom-info {
+  position: absolute;
+  bottom: 184px;
+  left: 16px;
+  right: 70px; 
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resso-badge {
+  align-self: flex-start;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #ff0055;
+  background: rgba(255, 0, 85, 0.12);
+  padding: 2px 7px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 0, 85, 0.25);
+  margin-bottom: 2px;
+}
+
+.song-title-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.song-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.song-artist {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+/* Progress Bar */
+.progress-container {
+  position: absolute;
+  bottom: 162px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+}
+
+.progress-bar-wrapper {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  position: absolute;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff0055 0%, #ff5050 100%);
+  box-shadow: 0 0 6px rgba(255, 0, 85, 0.5);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.progress-slider {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Center Play/Pause Flash Button */
+.center-play-btn {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 20;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.center-play-btn.show {
+  opacity: 1;
+}
+
+/* Media Controls Container */
+.resso-media-controls {
+  position: absolute;
+  bottom: 110px; /* Generous 40px gap above the 70px bottom nav */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.resso-media-controls .media-controls-overlay {
+  margin-top: 0;
+}

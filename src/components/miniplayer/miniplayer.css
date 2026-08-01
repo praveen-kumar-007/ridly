@@ -1,0 +1,82 @@
+.mini-player-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(15, 15, 15, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  z-index: 1000;
+  cursor: pointer;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+.mini-player-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.mini-player-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.mini-player-info h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-player-info p {
+  margin: 2px 0 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mini-control-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.mini-play-btn {
+  color: #ff0055;
+}
+
+.mini-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: #ff0055;
+  transition: width 0.1s linear;
+}

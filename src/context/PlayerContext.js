@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 import { getYoutubeVideoId } from '../api';
 import YouTube from 'react-youtube';
 
@@ -33,6 +33,7 @@ export const PlayerProvider = ({ children }) => {
   const [isLoadingQueueTrack, setIsLoadingQueueTrack] = useState(false);
   
   const [ytPlayer, setYtPlayer] = useState(null);
+  const audioRef = useRef(null);
 
   // Persist state when it changes
   useEffect(() => { localStorage.setItem('ridly_queue', JSON.stringify(queue)); }, [queue]);
@@ -71,9 +72,12 @@ export const PlayerProvider = ({ children }) => {
     // 0 = ended, 1 = playing, 2 = paused
     if (event.data === 1) {
       setIsPlaying(true);
+      if (audioRef.current) audioRef.current.play().catch(()=>{});
     } else if (event.data === 2) {
       setIsPlaying(false);
+      if (audioRef.current) audioRef.current.pause();
     } else if (event.data === 0) {
+      if (audioRef.current) audioRef.current.pause();
       if (isRepeat) {
         event.target.playVideo();
       } else {
@@ -86,8 +90,10 @@ export const PlayerProvider = ({ children }) => {
     if (!ytPlayer || !currentTrack) return;
     if (isPlaying) {
       ytPlayer.pauseVideo();
+      if (audioRef.current) audioRef.current.pause();
     } else {
       ytPlayer.playVideo();
+      if (audioRef.current) audioRef.current.play().catch(()=>{});
     }
   };
 
@@ -173,6 +179,19 @@ export const PlayerProvider = ({ children }) => {
   const toggleShuffle = () => setIsShuffle(!isShuffle);
   const toggleRepeat = () => setIsRepeat(!isRepeat);
 
+  const cyclePlaybackMode = () => {
+    if (!isShuffle && !isRepeat) {
+      setIsRepeat(true);
+      setIsShuffle(false);
+    } else if (isRepeat && !isShuffle) {
+      setIsRepeat(false);
+      setIsShuffle(true);
+    } else {
+      setIsRepeat(false);
+      setIsShuffle(false);
+    }
+  };
+
   const seek = (percentage) => {
     if (!ytPlayer || !duration) return;
     const time = (percentage / 100) * duration;
@@ -205,9 +224,11 @@ export const PlayerProvider = ({ children }) => {
 
       navigator.mediaSession.setActionHandler('play', () => {
          if (ytPlayer) ytPlayer.playVideo();
+         if (audioRef.current) audioRef.current.play().catch(()=>{});
       });
       navigator.mediaSession.setActionHandler('pause', () => {
          if (ytPlayer) ytPlayer.pauseVideo();
+         if (audioRef.current) audioRef.current.pause();
       });
       navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
       navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
@@ -233,13 +254,21 @@ export const PlayerProvider = ({ children }) => {
       prevTrack,
       toggleShuffle,
       toggleRepeat,
+      cyclePlaybackMode,
       seek,
       formatTime,
       setQueue
     }}>
       {children}
+      <audio 
+        ref={audioRef} 
+        src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==" 
+        loop 
+        playsInline 
+        style={{ display: 'none' }} 
+      />
       {currentTrack && currentTrack.youtubeId && (
-        <div style={{ display: 'none' }}>
+        <div style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}>
           <YouTube 
             videoId={currentTrack.youtubeId} 
             opts={{

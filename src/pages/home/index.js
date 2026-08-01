@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import Lib from '../lib/index'
-import Player from '../player/index'
-import Trend from '../trend/index'
-import Feed from '../feed/index'
-import Fav from '../fav/index'
-import Search from '../search/index'
-import Login from '../auth/login'
-import Settings from '../settings/index'
-import './home.css'
-import Sidebar from '../../components/sidebar'
-import { PlayerProvider } from '../../context/PlayerContext'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Lib from '../lib/index';
+import Player from '../player/index';
+import Trend from '../trend/index';
+import Feed from '../feed/index';
+import Fav from '../fav/index';
+import Search from '../search/index';
+import Login from '../auth/login';
+import Settings from '../settings/index';
+import Playlists from '../playlists/index';
+import './home.css';
+import Sidebar from '../../components/sidebar';
+import { PlayerProvider } from '../../context/PlayerContext';
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -41,8 +42,12 @@ export default function Home() {
     <PlayerProvider>
       <Router>
         <div className='main-body'>
-          {/* Top Left Brand Logo */}
-          <div className="top-left-brand">
+          {/* Top Left Brand Logo (Ravixa) */}
+          <div 
+             className="top-left-brand"
+             onClick={() => setShowProfileModal(true)}
+             title="Ravixa Menu"
+          >
             <img src="/logo.png" alt="Ravixa Music" />
           </div>
 
@@ -50,12 +55,12 @@ export default function Home() {
           <div 
              className="top-right-profile" 
              onClick={() => setShowProfileModal(true)}
-             title="Profile"
+             title="Ravixa Account & Navigation"
           >
             <img src={user?.picture || 'https://ui-avatars.com/api/?name=U'} alt="Profile" />
           </div>
 
-          {/* Premium Bottom Sheet Profile Menu */}
+          {/* Ravixa Dropdown & Navigation Sheet */}
           {showProfileModal && (
             <div className="profile-sheet-overlay" onClick={() => setShowProfileModal(false)}>
               <div className="profile-sheet-content" onClick={e => e.stopPropagation()}>
@@ -65,40 +70,57 @@ export default function Home() {
                   <img src={user?.picture || 'https://ui-avatars.com/api/?name=U'} alt="Profile" className="sheet-avatar" />
                   <div className="sheet-user-info">
                     <h2>{user?.isGuest ? 'Guest Account' : user?.name}</h2>
-                    <p>{user?.isGuest ? 'Not logged in' : user?.email}</p>
+                    <p>{user?.isGuest ? 'Ravixa Music Guest' : user?.email}</p>
                   </div>
                 </div>
 
                 <div className="sheet-body">
-                  <p className="sheet-message">
-                    {user?.isGuest 
-                      ? 'Sign in to Ravixa to unlock personalized recommendations, sync your favorites, and join the community.' 
-                      : 'Manage your taste profile, configure API settings, or sign out of your account.'}
+                  <p className="sheet-message" style={{marginBottom: '20px', textAlign: 'left', fontWeight: '700', fontSize: '0.85rem', color: '#ff0055', textTransform: 'uppercase', letterSpacing: '1px'}}>
+                    ⚡ RAVIXA MENU & ZONALS
                   </p>
                 </div>
 
                 <div className="sheet-actions">
                   <Link 
-                    to="/settings" 
+                    to="/mixes" 
                     className="sheet-btn secondary-btn" 
-                    style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}} 
+                    style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '15px', paddingLeft: '20px'}} 
                     onClick={() => setShowProfileModal(false)}
                   >
-                    ⚙️ API Settings
+                    <span style={{fontSize: '1.3rem'}}>🌀</span> 
+                    <div>
+                      <div style={{color: '#fff', fontWeight: '700'}}>Zonals & Mixes</div>
+                      <div style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', fontWeight: '400'}}>Explore Moods & Vibe Generators</div>
+                    </div>
                   </Link>
+
+                  <Link 
+                    to="/settings" 
+                    className="sheet-btn secondary-btn" 
+                    style={{textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '15px', paddingLeft: '20px'}} 
+                    onClick={() => setShowProfileModal(false)}
+                  >
+                    <span style={{fontSize: '1.3rem'}}>⚙️</span> 
+                    <div>
+                      <div style={{color: '#fff', fontWeight: '700'}}>Settings & Audio</div>
+                      <div style={{fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', fontWeight: '400'}}>API keys, playback quality & preferences</div>
+                    </div>
+                  </Link>
+
                   <button 
                     className="sheet-btn primary-btn" 
-                    style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}} 
+                    style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '10px'}} 
                     onClick={handleAuthAction}
                   >
                     {user?.isGuest ? '🔑 Log In to Ravixa' : '🚪 Log Out'}
                   </button>
+
                   <button 
                     className="sheet-btn secondary-btn" 
                     style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}} 
                     onClick={() => setShowProfileModal(false)}
                   >
-                    ❌ Cancel
+                    ❌ Close Menu
                   </button>
                 </div>
               </div>
@@ -109,19 +131,20 @@ export default function Home() {
             <div className='main-content'>
               <Routes>
                 <Route path="/mixes" element={<Lib/>} />
-                <Route path="/" element={<Lib/>} />
+                <Route path="/" element={<Feed/>} />
                 <Route path="/search" element={<Search/>} />
                 <Route path="/favorites" element={<Fav/>} />
                 <Route path="/feed" element={<Feed/>} />
                 <Route path="/player" element={<Player/>} />
                 <Route path="/trend" element={<Trend/>} />
                 <Route path="/settings" element={<Settings/>} />
+                <Route path="/playlists" element={<Playlists/>} />
               </Routes>
-          </div>
+            </div>
           </div>
         </div>
-        <Sidebar /> {/* Moved outside main-body to fix mobile positioning */}
+        <Sidebar />
       </Router>
     </PlayerProvider>
-  )
+  );
 }

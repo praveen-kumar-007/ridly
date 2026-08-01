@@ -2,9 +2,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px;
-    margin-top: 25px;
-    opacity: 0.5;
+    gap: 16px;
+    margin: 0;
+    opacity: 0.92;
     transition: opacity 0.3s;
 }
 
@@ -16,25 +16,49 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 45px;
-    height: 45px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     cursor: pointer;
-    transition: all 0.2s;
-    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     position: relative;
     overflow: hidden;
 }
 
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.18);
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.control-btn:active {
+    transform: scale(0.94);
 }
 
 .control-btn.skip-btn {
-    background: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    background: rgba(255, 255, 255, 0.12);
+    width: 38px;
+    height: 38px;
 }
-.control-btn.skip-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.1);
+
+.control-btn.play-pause-btn {
+    width: 48px;
+    height: 48px;
+    background: #ffffff;
+    border: none;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.control-btn.play-pause-btn:hover {
+    background: #ffffff;
+    transform: scale(1.06);
+    box-shadow: 0 8px 25px rgba(255, 255, 255, 0.38), 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.control-btn.play-pause-btn svg {
+    color: #121212 !important;
 }
