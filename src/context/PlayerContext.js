@@ -316,7 +316,8 @@ export const PlayerProvider = ({ children }) => {
         src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//OEAAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAAFAAAACAAAMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDD/4BMgAAAAAANAAAAAAAAMAAAAAAAABAAAAAA" 
         loop 
         playsInline 
-        style={{ display: 'none' }} 
+        autoPlay
+        style={{ position: 'fixed', bottom: 0, right: 0, width: '1px', height: '1px', opacity: 0.01, pointerEvents: 'none' }} 
       />
       {currentTrack && currentTrack.youtubeId && (
         <div style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', opacity: 0 }}>

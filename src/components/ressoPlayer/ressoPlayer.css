@@ -194,7 +194,7 @@
 /* Floating On-Screen Live Lyrics (No Box Collision!) */
 .on-screen-lyrics-container {
   position: absolute;
-  bottom: 255px;
+  bottom: calc(270px + env(safe-area-inset-bottom, 0px));
   left: 18px;
   right: 75px; /* Clear gap from right sidebar at right: 14px */
   display: flex;
@@ -284,7 +284,7 @@
 .resso-sidebar {
   position: absolute;
   right: 14px;
-  bottom: 220px;
+  bottom: calc(235px + env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -329,7 +329,7 @@
 /* Bottom Info */
 .resso-bottom-info {
   position: absolute;
-  bottom: 184px;
+  bottom: calc(198px + env(safe-area-inset-bottom, 0px));
   left: 16px;
   right: 70px; 
   z-index: 10;
@@ -383,7 +383,7 @@
 /* Progress Bar */
 .progress-container {
   position: absolute;
-  bottom: 162px;
+  bottom: calc(175px + env(safe-area-inset-bottom, 0px));
   left: 16px;
   right: 16px;
   z-index: 10;
@@ -451,7 +451,7 @@
 /* Media Controls Container */
 .resso-media-controls {
   position: absolute;
-  bottom: 110px; /* Generous 40px gap above the 70px bottom nav */
+  bottom: calc(125px + env(safe-area-inset-bottom, 0px)); /* Generous gap above bottom navigation bar */
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
