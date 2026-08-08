@@ -100,11 +100,14 @@ export default function RessoPlayer({ tracks = [], onLoadMore }) {
     };
   }, [tracks, currentIndex, playPlaylist, onLoadMore]);
 
-  // Sync scroll position when currentIndex changes externally (e.g. queue modal)
+  // Sync scroll position when currentIndex changes externally (e.g. queue modal or song end)
   useEffect(() => {
-    if (cardRefs.current[currentIndex]) {
-      cardRefs.current[currentIndex].scrollIntoView({ behavior: 'smooth' });
-    }
+    const timer = setTimeout(() => {
+      if (cardRefs.current[currentIndex]) {
+        cardRefs.current[currentIndex].scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+    return () => clearTimeout(timer);
   }, [currentIndex]);
 
   // Load comments for current track

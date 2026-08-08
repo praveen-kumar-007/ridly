@@ -31,8 +31,9 @@ export default function Feed() {
                       acc[artist] = (acc[artist] || 0) + 1;
                       return acc;
                   }, {});
-                  const topArtist = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-                  targetQuery = `${topArtist} latest new songs 2024`;
+                  const sortedArtists = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+                  const topArtists = sortedArtists.slice(0, 3).join(" ");
+                  targetQuery = `${topArtists} latest new songs 2024`;
               }
           } catch (err) {
               console.error("Failed to load user preferences", err);

@@ -113,7 +113,7 @@ export const searchTracks = async (query, pageToken = '', limit = 30) => {
             return await axios.get(`${BASE_URL}/search`, {
                 params: {
                     part: 'snippet',
-                    q: `${query} official audio`,
+                    q: `${query} official audio -shorts -short`,
                     type: 'video',
                     videoCategoryId: '10', // Music
                     maxResults: Math.min(limit * 2, 50), // Fetch more to shuffle well
@@ -155,7 +155,7 @@ export const getYoutubeVideoId = async (trackName, artistName) => {
     if (cachedId) return cachedId;
 
     try {
-        const query = encodeURIComponent(`${trackName} ${artistName} official audio`);
+        const query = encodeURIComponent(`${trackName} ${artistName} official audio -shorts -short`);
         const response = await executeWithRotation(async (apiKey) => {
             return await axios.get(`${BASE_URL}/search?part=snippet&q=${query}&type=video&key=${apiKey}`);
         });
